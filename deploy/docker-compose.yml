@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  nexus:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: nexus-assistant
+    restart: unless-stopped
+
+    # Environment variables
+    env_file:
+      - ../.env
+
+    # Data persistence
+    volumes:
+      - nexus-data:/root/.nexus
+      - nexus-sessions:/root/.nexus/sessions
+      - nexus-contexts:/root/.nexus/contexts
+
+    # Resource limits (adjust as needed)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "nexus"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Keep container running
+    tty: true
+    stdin_open: true
+
+  # Optional: Ollama for local AI
+  ollama:
+    image: ollama/ollama:latest
+    container_name: nexus-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+volumes:
+  nexus-data:
+    driver: local
+  nexus-sessions:
+    driver: local
+  nexus-contexts:
+    driver: local
+  ollama-data:
+    driver: local
+
+networks:
+  default:
+    name: nexus-network
