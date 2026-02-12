@@ -1,1 +1,7 @@
-ttteeeessssttt
+{
+  "name": "Nexus Assistant",
+  "description": "Forever terminal integrating multiple AI CLIs for executive functioning",
+  "version": "0.1.0",
+  "ticker": "NEXUS",
+  "homepage": "https://github.com/yourusername/nexus-assistant"
+}
